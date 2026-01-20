@@ -1,18 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- 1. SUBTLE PARALLAX ON SCROLL (Optional but adds depth) ---
+    // --- 1. SUBTLE PARALLAX ON SCROLL ---
     const blobs = document.querySelectorAll('.aurora-blob');
     
     window.addEventListener('scroll', () => {
         const scrolled = window.scrollY;
-        
         blobs.forEach((blob, index) => {
-            // Very subtle vertical movement opposite to scroll
-            // Multiplier (index + 1) makes them move at slightly different speeds
             const speed = (index + 1) * 0.05; 
             const yPos = -(scrolled * speed);
-            
-            // We only translate Y here. The CSS animation handles X, Scale, and Rotate.
             blob.style.transform = `translateY(${yPos}px)`;
         });
     });
@@ -41,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let current = '';
         sections.forEach(section => {
             const sectionTop = section.offsetTop;
-            // Adjustment for the floating nav height
             if (scrollY >= sectionTop - 150) {
                 current = section.getAttribute('id');
             }
@@ -55,6 +49,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- 4. DYNAMIC YEAR ---
+    // --- 4. 3D TILT EFFECT (Professional Mouse Tracking) ---
+    const tiltCards = document.querySelectorAll('.tilt-card');
+
+    tiltCards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Calculate rotation (Max 15 degrees)
+            const xPct = (x / rect.width) - 0.5;
+            const yPct = (y / rect.height) - 0.5;
+
+            // RotateY depends on X position, RotateX depends on Y position (inverted)
+            const xRot = yPct * -15; 
+            const yRot = xPct * 15; 
+
+            // Apply the 3D Rotation
+            card.style.transform = `perspective(1000px) rotateX(${xRot}deg) rotateY(${yRot}deg) scale(1.02)`;
+            
+            // Update Shine Position using CSS Variables
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+        });
+
+        // Reset on Mouse Leave
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+        });
+    });
+
+    // --- 5. DYNAMIC YEAR ---
     document.getElementById('year').textContent = new Date().getFullYear();
 });
